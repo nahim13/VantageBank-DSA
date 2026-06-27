@@ -39,10 +39,19 @@ public:
     AccountType getType() const { return type; }
     std::string getTier() const;
 
-    void deposit(double amt, std::string note = "Deposit");
-    bool withdraw(double amt, std::string note = "Withdrawal");
+    bool deposit(double amt, std::string note = "Deposit");   // FIX #4: returns bool, validates amount
+    bool withdraw(double amt, std::string note = "Withdrawal"); // FIX #6: checks active status
     void deactivate() { active = false; }
     const std::vector<Transaction> &getHistory() const { return history; }
+};
+
+// FIX #7: Replace raw BST with AVL tree to prevent degenerate case on sorted inserts
+struct AVLNode
+{
+    std::shared_ptr<Account> acc;
+    AVLNode *left, *right;
+    int height;
+    AVLNode(std::shared_ptr<Account> a) : acc(a), left(nullptr), right(nullptr), height(1) {}
 };
 
 struct AccountNode
@@ -52,23 +61,21 @@ struct AccountNode
     AccountNode(std::shared_ptr<Account> a) : acc(a), next(nullptr) {}
 };
 
-struct BSTNode
-{
-    std::shared_ptr<Account> acc;
-    BSTNode *left, *right;
-    BSTNode(std::shared_ptr<Account> a) : acc(a), left(nullptr), right(nullptr) {}
-};
-
 class Bank
 {
 private:
     AccountNode *head;
-    BSTNode *bstRoot;
+    AVLNode *avlRoot;
     int nextAccNo;
 
-    BSTNode *insertBST(BSTNode *root, std::shared_ptr<Account> acc);
-    BSTNode *searchBST(BSTNode *root, int accNo) const;
-    void freeBST(BSTNode *node);
+    // AVL helpers
+    int height(AVLNode *n) const;
+    int balanceFactor(AVLNode *n) const;
+    AVLNode *rotateRight(AVLNode *y);
+    AVLNode *rotateLeft(AVLNode *x);
+    AVLNode *insertAVL(AVLNode *root, std::shared_ptr<Account> acc);
+    AVLNode *searchAVL(AVLNode *root, int accNo) const;
+    void freeAVL(AVLNode *node);
 
 public:
     Bank();
