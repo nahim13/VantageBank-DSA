@@ -9,10 +9,14 @@ public:
     MainFrame(const wxString &title, Bank *bank);
 
 private:
-    Bank *bankPtr;
+    Bank *bankPtr;           // non-owning; lifetime managed by MainApp
     wxListCtrl *listCtrl;
+
     void RefreshList();
+    void OnCreate(wxCommandEvent &e);
+    void OnDeposit(wxCommandEvent &e);      // FIX #2 (GUI): added
+    void OnWithdraw(wxCommandEvent &e);     // FIX #2 (GUI): added
+    void OnTransfer(wxCommandEvent &e);     // FIX #2 (GUI): added
     void OnApplyInterest(wxCommandEvent &e);
     void OnStatement(wxCommandEvent &e);
-    void OnCreate(wxCommandEvent &e);
 };
